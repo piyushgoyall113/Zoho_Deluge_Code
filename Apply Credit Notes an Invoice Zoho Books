@@ -1,0 +1,41 @@
+
+creditnoteID = creditnote.get("creditnote_id");
+creditNoteDate = creditnote.get("date").toDate();
+organizationID = organization.get("organization_id");
+contactid = 2755065000006456067;
+Getcustomer = invokeurl
+[
+	url :"https://www.zohoapis.com/books/v3/contacts/" + contactid + "?organization_id=" + organizationID
+	type :GET
+	connection:"zohobooks"
+];
+unused_credits_receivable_amount = Getcustomer.getJSON("contact").getJSON("unused_credits_receivable_amount");
+if(unused_credits_receivable_amount > 0)
+{
+	InvoiceID = 2755065000006473354;
+	GetInviceDetails = invokeurl
+	[
+		url :"https://www.zohoapis.com/books/v3/invoices/" + InvoiceID + "?organization_id=" + organizationID
+		type :GET
+		connection:"zohobooks"
+	];
+	//..................................Param
+	Creditmaplist = List();
+	Creditmap = Map();
+	Creditmap.put("invoice_id", "2755065000006473354");
+	Creditmap.put("amount_applied", unused_credits_receivable_amount);
+	Creditmaplist.add(Creditmap);
+	mp = Map();
+	mp.put("invoices", Creditmaplist);
+	params1 = Map();
+	params1.put("JSONString",mp);
+	Credit_Note_Id = "2755065000007226001";
+	CreateCredinote = invokeurl
+	[
+		url :"https://www.zohoapis.com/books/v3/creditnotes/"+Credit_Note_Id+"/invoices?organization_id="+organizationID
+		type :POST
+		parameters:params1
+		connection:"zohobooks"
+	];
+	info CreateCredinote;
+}
